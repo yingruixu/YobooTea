@@ -16,14 +16,11 @@ import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
-import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.quartz.LocalDataSourceJobStore;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -115,5 +112,45 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new PageResult(total,records);
     }
 
+    /**
+     * Strat or stop employee account
+     * @param status,id
+     *
+     */
+    public void startOrStop(Integer status, Long id) {
+        //Update employee table set status = ? where id = ?
+        Employee employee = new Employee();
+        employee.setStatus(status);
+        employee.setId(id);
+
+        employeeMapper.update(employee);
+    }
+
+    /**
+     * Get employee by id
+     * @param id
+     * @return
+     */
+    public Employee getEmployeeByID(Long id) {
+        Employee employee = employeeMapper.getEmployeeByID(id);
+        employee.setPassword("******");
+        return employee;
+    }
+
+    /**
+     * Edit employee info
+     * @param
+     *
+     */
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+        // Set date time
+        employee.setUpdateTime(LocalDateTime.now());
+        // Set creator id and editor id
+        Long empID = BaseContext.getCurrentId();
+        employee.setUpdateUser(empID);
+        employeeMapper.update(employee);
+    }
 
 }
